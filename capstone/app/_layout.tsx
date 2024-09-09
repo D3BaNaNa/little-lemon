@@ -1,37 +1,74 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { useEffect } from 'react';
-import 'react-native-reanimated';
+import { NavigationContainer } from "@react-navigation/native";
+import {createNativeStackNavigator} from "@react-navigation/native-stack"
 
-import { useColorScheme } from '@/hooks/useColorScheme';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
+import Onboarding from "./Onboarding"
+import Profile from "./Profile";
+import Home from "./Home"
+import Loading from "./Loading"
 
-export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
 
-  useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
+import { useEffect, useState } from "react";
+
+const Stack = createNativeStackNavigator();
+
+export default function RootLayout() {  
+  const [signedIn, setSignedIn] = useState(false)
+  const [dataLoaded, setDataLoaded] = useState(false)
+
+  let screenShown;
+
+  const getSignedIn = async() => {
+    try {
+      setSignedIn(await AsyncStorage.getItem("isSignedIn") === "yes")
+
+    } catch(e) {
+      console.error(e)
     }
-  }, [loaded]);
-
-  if (!loaded) {
-    return null;
   }
 
-  return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-    </ThemeProvider>
-  );
+  useEffect(() => {getSignedIn}, [])
+
+  setInterval(getSignedIn, 250)
+
+  useEffect(() => {
+    setDataLoaded(true)
+  }, [signedIn])
+
+  if (dataLoaded) {
+    screenShown = signedIn
+    ? <Stack.Screen name="Profile" component={Profile} />
+    : <Stack.Screen name="Onboarding" component={Onboarding} />
+  }
+
+  // useEffect(() => {
+  //   // console.log(signedIn)
+  // }, [signedIn])
+  
+
+
+  if (dataLoaded) {
+    return (
+      <Stack.Navigator>
+        
+        {screenShown}
+        <Stack.Screen name="Home" component={Home} />
+         
+        
+        
+        
+      </Stack.Navigator>
+    );
+
+  } else {
+    return (
+      <Stack.Navigator initialRouteName={"Loading"}>
+        
+        <Stack.Screen name="Loading" component={Loading} />
+        
+      </Stack.Navigator>
+    );
+  }
+    
 }
