@@ -30,7 +30,6 @@ export default function Onboarding({navigation} : {navigation: any}) {
 
   const handleClick = async () => {
     try {
-      await AsyncStorage.setItem("isSignedIn", "yes")
       await AsyncStorage.setItem("name", name)
       await AsyncStorage.setItem("email", email)
       await AsyncStorage.setItem("phone", "null")
@@ -42,7 +41,9 @@ export default function Onboarding({navigation} : {navigation: any}) {
       await AsyncStorage.removeItem("three")
       await AsyncStorage.removeItem("four")
 
-      navigation.navigate("Home")
+      await AsyncStorage.setItem("isSignedIn", "yes")
+
+      // navigation.navigate("Home")
   
     } catch(e) {
       console.error(e)

@@ -369,7 +369,8 @@ const styles = StyleSheet.create({
     marginHorizontal: "5%",
     height: "10%",
     marginBottom: "5%",
-    fontFamily: "Karla"
+    fontFamily: "Karla",
+    padding: "1%"
   },
   notificationsArea: {
     flex: 0.25,

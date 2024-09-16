@@ -16,6 +16,7 @@ const Stack = createNativeStackNavigator();
 export default function RootLayout() {  
   const [signedIn, setSignedIn] = useState(false)
   const [dataLoaded, setDataLoaded] = useState(false)
+  const [initialScreen, setInitialScreen] = useState("Onboarding")
 
   let screenShown;
 
@@ -34,26 +35,33 @@ export default function RootLayout() {
 
   useEffect(() => {
     setDataLoaded(true)
+    signedIn ? setInitialScreen("Home") : setInitialScreen("Onboarding")
   }, [signedIn])
 
   if (dataLoaded) {
     screenShown = signedIn
-    ? <Stack.Screen name="Profile" component={Profile} />
-    : <Stack.Screen name="Onboarding" component={Onboarding} />
+    ? [<Stack.Screen name="Home" component={Home} key="Home"/>,
+      <Stack.Screen name="Profile" component={Profile} key="Profile"/>
+    ]
+    
+    : [<Stack.Screen name="Onboarding" component={Onboarding} key="Onboarding"/>,
+      <Stack.Screen name="Home" component={Home} key="Home"/>,
+    ]
+
+    
   }
 
   // useEffect(() => {
   //   // console.log(signedIn)
   // }, [signedIn])
-  
 
 
   if (dataLoaded) {
     return (
-      <Stack.Navigator>
+      <Stack.Navigator initialRouteName={initialScreen}>
         
         {screenShown}
-        <Stack.Screen name="Home" component={Home} />
+        
          
         
         
